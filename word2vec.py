@@ -82,13 +82,15 @@ class word2vec:
                 print('iter : {}, loss : {}'.format(iter, loss))
                 self.tr_loss_hist.append(loss)
 
-a = word2vec(sentences)
 
-plt.plot(a.tr_loss_hist)
-for word in a.word_list:
-    tmp = a.sess.run(a._embeddings[a.word_dic[word]])
-    x, y = tmp[0], tmp[1]
-    plt.scatter(x, y)
-    plt.annotate(word, xy=(x, y), xytext=(5, 2), textcoords='offset points', ha='right', va='bottom')
+if __name__ == "__main__":
+    a = word2vec(sentences)
+
+    plt.plot(a.tr_loss_hist)
+    for word in a.word_list:
+        tmp = a.sess.run(a._embeddings[a.word_dic[word]])
+        x, y = tmp[0], tmp[1]
+        plt.scatter(x, y)
+        plt.annotate(word, xy=(x, y), xytext=(5, 2), textcoords='offset points', ha='right', va='bottom')
 
 
