@@ -5,13 +5,14 @@ from matplotlib import font_manager, rc
 font_name = font_manager.FontProperties(fname="c:/Windows/Fonts/malgun.ttf").get_name()
 rc('font', family=font_name)
 
-sentences = ["나 고양이 좋다",
-             "나 개 싫다",
-             "너 고양이 싫다",
-             "너 개 좋다"]
+sentences = ["나 고양이 노의미 좋다",
+             "나 개 노의미 싫다",
+             "너 고양이 노의미 싫다",
+             "너 개 노의미 좋다",
+             "나 너", "나 너", "나 너", "나 너", "나 너", "나 너"]
 
 class word2vec:
-    def __init__(self, corpus=None, embedding_size=2, window=2, iteration=3000, sg=1, num_sample=6):
+    def __init__(self, corpus=None, embedding_size=2, window=3, iteration=3000, sg=1, num_sample=7):
         self.corpus = corpus
         self.embedding_size = embedding_size
         self.window = window
@@ -63,10 +64,10 @@ class word2vec:
                     if (idx + i < 0) | (idx + i >= len(tmp)):
                         continue
                     context_word = tmp[idx + i]
-                    if self.sg == 1: # skip-gram
+                    if self.sg == 1:  # skip-gram
                         self.batch_x.append(self.word_dic[center_word])
                         self.batch_y.append([self.word_dic[context_word]])
-                    else: # cbow
+                    else:  # cbow
                         self.batch_x.append(self.word_dic[context_word])
                         self.batch_y.append([self.word_dic[center_word]])
 
@@ -74,17 +75,21 @@ class word2vec:
         train_batch_x = np.array(self.batch_x)
         train_batch_y = np.array(self.batch_y)
         self.sess.run(tf.global_variables_initializer())
-        for iter in range(self.iteration * round(train_batch_x.shape[0]/self.batch_size)):
+        for iter in range(self.iteration * round(train_batch_x.shape[0] / self.batch_size)):
             batch_idx = np.random.choice(train_batch_x.shape[0], self.batch_size, False)
             _, loss = self.sess.run([self.train_step, self.nce_loss],
-                                    feed_dict={self.x:train_batch_x[batch_idx], self.y:train_batch_y[batch_idx]})
+                                    feed_dict={self.x: train_batch_x[batch_idx], self.y: train_batch_y[batch_idx]})
             if iter % 300 == 0:
                 print('iter : {}, loss : {}'.format(iter, loss))
                 self.tr_loss_hist.append(loss)
 
-
 if __name__ == "__main__":
-    a = word2vec(sentences)
+    word_list = []
+    for word in sentences:
+        [word_list.append(token) for token in word.split()]
+        word_list = list(set(word_list))
+
+    a = word2vec(sentences, num_sample=len(word_list))
 
     plt.plot(a.tr_loss_hist)
     for word in a.word_list:
@@ -92,5 +97,3 @@ if __name__ == "__main__":
         x, y = tmp[0], tmp[1]
         plt.scatter(x, y)
         plt.annotate(word, xy=(x, y), xytext=(5, 2), textcoords='offset points', ha='right', va='bottom')
-
-
