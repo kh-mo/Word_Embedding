@@ -80,7 +80,16 @@ class word2vec:
             if iter % 300 == 0:
                 print('iter : {}, loss : {}'.format(iter, loss))
                 self.tr_loss_hist.append(loss)
-
+    
+    def negative_sampling(self):
+        sampled_ids, _, _ = (tf.nn.fixed_unigram_candidate_sampler(
+            true_classes=self.batch_y,
+            num_true=1,
+            num_sampled=2,
+            range_max=7,
+            unique=True,
+            unigrams=[2, 2, 4, 2, 2, 2, 2]))##word 별 리스트 필요
+        
 if __name__ == "__main__":
     a = word2vec(sentences)
 
